@@ -1,0 +1,51 @@
+
+$buf = input( "保存先フォルダ", directory2 );
+
+#hwnd = hidemaruhandle( 0 ); //元ウィンドウのハンドルを取得する
+openfile "/h";
+#hwnd_new = hidemaruhandle( 0 ); // 新しく開いたファイルのウィンドウハンドルの取得
+
+#i = 0;
+while (#i < hidemarucount) {
+	#hwnd[#i] = hidemaruhandle(#i);
+	#i = #i + 1;
+}
+
+setbackgroundmode 1;
+
+#i = 0;
+$str = "";
+while (#i < hidemarucount) {
+	setactivehidemaru #hwnd[#i];
+	if (filename2 != "") {
+		$str = $str + "Set Files[" + str(#i) + "]=" + filename2 + "\n";
+		$str = $str + "Set Line[" + str(#i) + "]=" + str(lineno) + "\n";
+	}
+	#i = #i + 1;
+}
+
+setactivehidemaru #hwnd_new; // 新しく開いたファイルに戻る
+
+insert "@echo off" + "\n";
+insert "setlocal enabledelayedexpansion" + "\n";
+insert "\n";
+
+insert $str + "\n";
+
+insert "rem foreachループ" + "\n";
+insert "set i=1" + "\n";
+insert ":FOREACH" + "\n";
+insert "Set it=!Files[%i%]!" + "\n";
+insert "if defined it (" + "\n";
+insert "  echo \"/j!Line[%i%]! %it%\"" + "\n";
+insert "  start \"\" \"C:\\Program Files\\Hidemaru\\Hidemaru.exe\" \"/j!Line[%i%]! %it%\"" + "\n";
+insert "  set /a i+=1" + "\n";
+insert "  goto :FOREACH" + "\n";
+insert ")" + "\n";
+
+
+saveas $buf+"\\OpenLlist.bat";
+
+setactivehidemaru #hwnd; //元ウィンドウに戻る
+closehidemaruforced #hwnd_new; // 新しく開いたファイルを閉じる
+endmacro;
